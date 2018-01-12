@@ -39,6 +39,7 @@ cc.Class({
         cc.log("onload game")
         this.isRecord = false;
         this.isReplay = false;
+        this.music=[];
         this.note = [7,8,9,"mov",4,5,6,"x",1,2,3,"-",0,"point","=","+"];
 
         for (let i = 0; i < this.note.length; i++) {
@@ -79,7 +80,10 @@ cc.Class({
         cc.audioEngine.play(this.getUrl(audioName),false,1)
     },
     onReplay(){
-
+        if (this.isRecord || this.music.length==0) {
+            cc.log("请先录制")
+            return;
+        }
         this.isReplay = !this.isReplay;
         this.palyBtnTittle.string = this.isReplay?"停止":"播放";
         this.unscheduleAllCallbacks();
@@ -110,21 +114,5 @@ cc.Class({
             this.timer+=dt;
             this.recordTime.string = parseInt(this.timer);
         }
-        // if (this.isReplay) {
-        //     this.replayTime+=dt;
-        //     if (this.musicTemp.length == 0) {
-        //         this.isReplay = false;
-        //         return;
-        //     }
-        //     for (let i = 0; i < this.musicTemp.length; i++) {
-        //         const item = this.musicTemp[i];
-        //         if (item.time.toFixed(2) ==  this.replayTime.toFixed(2)) {
-        //             cc.log("time:",item.time.toFixed(2),"frame:",this.music.length+"-"+(this.music.length-this.musicTemp.length))
-        //             cc.audioEngine.play(this.getUrl(item.audioName),false,1);
-        //             this.musicTemp.splice(0,1)
-        //             break;
-        //         }
-        //     }
-        // }
     }
 });
