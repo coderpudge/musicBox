@@ -1,3 +1,4 @@
+
 // Learn cc.Class:
 //  - [Chinese] http://www.cocos.com/docs/creator/scripting/class.html
 //  - [English] http://www.cocos2d-x.org/docs/editors_and_tools/creator-chapters/scripting/class/index.html
@@ -30,7 +31,9 @@ cc.Class({
         panel:cc.Node,
         recordTime:cc.Label,
         recordBtnTittle:cc.Label,
-        palyBtnTittle:cc.Label
+        palyBtnTittle:cc.Label,
+        curNote:cc.Label,
+        showNode:cc.Node
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -40,14 +43,15 @@ cc.Class({
         this.isRecord = false;
         this.isReplay = false;
         this.music=[];
-        this.note = [7,8,9,"mov",4,5,6,"x",1,2,3,"-",0,"point","=","+"];
+        this.curNotes = "1155665  4433221  5544332  5544332  1155665  4433221"
+        // this.note = [7,8,9,"mov",4,5,6,"x",1,2,3,"-",0,"point","=","+"];
 
-        for (let i = 0; i < this.note.length; i++) {
-            const itemName = "item" + this.note[i];
-            var item = this.panel.getChildByName(itemName);
-            item.on(cc.Node.EventType.TOUCH_START,this.onPlay,this)
-            cc.log(itemName+"register")
-        }
+        // for (let i = 0; i < this.note.length; i++) {
+        //     const itemName = "item" + this.note[i];
+        //     var item = this.panel.getChildByName(itemName);
+        //     item.on(cc.Node.EventType.TOUCH_START,this.onPlay,this)
+        //     cc.log(itemName+"register")
+        // }
 
     },
 
@@ -67,6 +71,7 @@ cc.Class({
         }
     },
 
+    
     onPlay(event){
         cc.log("onplay")
         var audioName = event.currentTarget.name.substr("item".length)
@@ -103,10 +108,63 @@ cc.Class({
         }
 
     },
+
+    onKeyboardTouch(eventTouch){
+        var label = eventTouch.currentTarget.getChildByName("Label").getComponent(cc.Label);
+        var key = label.string;
+        cc.log("key",key);
+        var action={};
+        action.time=this.timer
+        action.audioName = key;
+        if (this.isRecord) {
+            this.music.push(action);
+        }
+        cc.audioEngine.play(this.getUrl(action.audioName),false,1)
+    },
+
+    gameStat(){
+        this.showNote(this.curNotes);
+    },
+
+    showNote(notes){
+        var len = notes.length;
+        var self = this;
+        for (let i = 0; i < notes.length; i++) {
+            var note = cc.instantiate(this.curNote);
+            cc.log(note);
+            // var node = cc.Node();
+            note.parent=this.showNode;
+            self.curNote.scheduleOnce(function() {
+                // this.playEffect(item.audioName);
+                // if (i==this.musicTemp.length-1) {
+                //     this.isReplay=!this.isReplay;
+                //     this.palyBtnTittle.string="播放"
+                // }
+                // self.curNote.stopAllActions();
+                self.curNote.string = notes.charAt(i);
+                var big = cc.scaleTo(1,3);
+                var hide = cc.fadeOut(0.5);
+                var show = cc.fadeIn(0.2);
+                var cb = cc.callFunc(function () {
+                    note.destory();
+                });
+                var seq = cc.sequence(show,big,hide,cb);
+                note.getComponent(cc.Node).runAction(seq);
+            },1.7*(i+1.2));
+        }
+    },
+    
     playEffect(audioName){
         cc.audioEngine.play(this.getUrl(audioName),false,1)
     },
     getUrl(url) {
+        if (url == "/") {
+            url = "mov";
+        }else if (url == ".") {
+            url = "=";
+        } if (url == "0") {
+            url = "=";
+        }
         return cc.url.raw("resources/sound/" + url+".mp3");
     },
     update (dt) {
@@ -115,4 +173,8 @@ cc.Class({
             this.recordTime.string = parseInt(this.timer);
         }
     }
+
+
+
+
 });
