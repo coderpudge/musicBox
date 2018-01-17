@@ -3604,7 +3604,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 83.33,
+      "width": 0,
       "height": 125
     },
     "_rotationX": 0,
@@ -3613,8 +3613,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -42,
-      "y": 307
+      "x": 0,
+      "y": 100
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -3641,7 +3641,7 @@
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
-    "_N$string": "0",
+    "_N$string": "",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -7715,14 +7715,14 @@
     },
     "_enabled": true,
     "_useOriginalSize": false,
-    "_actualFontSize": 40,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_lineHeight": 40,
     "_enableWrapText": false,
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "button",
+    "_N$string": "play",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -7862,7 +7862,7 @@
       "__id__": 83
     },
     "curNote": {
-      "__id__": 91
+      "__id__": 90
     },
     "showNode": {
       "__id__": 92

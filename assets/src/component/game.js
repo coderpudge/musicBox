@@ -32,7 +32,7 @@ cc.Class({
         recordTime:cc.Label,
         recordBtnTittle:cc.Label,
         palyBtnTittle:cc.Label,
-        curNote:cc.Label,
+        curNote:cc.Node,
         showNode:cc.Node
     },
 
@@ -43,7 +43,8 @@ cc.Class({
         this.isRecord = false;
         this.isReplay = false;
         this.music=[];
-        this.curNotes = "1155665  4433221  5544332  5544332  1155665  4433221"
+        this.curNotes = " 1155665  4433221  5544332  5544332  1155665  4433221"
+        // this.curNotes = "  1155"
         // this.note = [7,8,9,"mov",4,5,6,"x",1,2,3,"-",0,"point","=","+"];
 
         // for (let i = 0; i < this.note.length; i++) {
@@ -112,7 +113,18 @@ cc.Class({
     onKeyboardTouch(eventTouch){
         var label = eventTouch.currentTarget.getChildByName("Label").getComponent(cc.Label);
         var key = label.string;
+        this.useKey = key;
         cc.log("key",key);
+
+        // if (!this.checkNote(this.useKey)) {
+        //     this.unscheduleAllCallbacks();
+        //     this.curNote.stopAllActions();
+        //     cc.log("no click or not click!")
+        //     Alert.show("您没有跟上,再来一次？", function(){
+        //         self.gameStat();
+        //     });
+        // }
+
         var action={};
         action.time=this.timer
         action.audioName = key;
@@ -123,35 +135,61 @@ cc.Class({
     },
 
     gameStat(){
+        cc.log("game start")
         this.showNote(this.curNotes);
     },
 
     showNote(notes){
+        
         var len = notes.length;
         var self = this;
         for (let i = 0; i < notes.length; i++) {
-            var note = cc.instantiate(this.curNote);
-            cc.log(note);
-            // var node = cc.Node();
-            note.parent=this.showNode;
-            self.curNote.scheduleOnce(function() {
-                // this.playEffect(item.audioName);
-                // if (i==this.musicTemp.length-1) {
-                //     this.isReplay=!this.isReplay;
-                //     this.palyBtnTittle.string="播放"
-                // }
-                // self.curNote.stopAllActions();
-                self.curNote.string = notes.charAt(i);
-                var big = cc.scaleTo(1,3);
-                var hide = cc.fadeOut(0.5);
+        
+            this.scheduleOnce(function() {
+                let key = notes.charAt(i);
+                if (key == " ") {
+                    return;
+                }
+               
+                self.saveCurNote(i,key);
+                self.curNote.getComponent(cc.Label).string = key
+                var move= cc.moveTo(0.5,cc.v2(0,300))
+                var big = cc.scaleTo(0.5,2);
+                // var small = cc.scaleTo(0.1,1);
+                var hide = cc.fadeOut(1);
                 var show = cc.fadeIn(0.2);
+                var spawn1 = cc.spawn(show,move,big);
+                var ease1 = cc.easeElasticOut(0.5);
                 var cb = cc.callFunc(function () {
-                    note.destory();
+                    if (!self.checkNote(self.useKey)) {
+                        self.unscheduleAllCallbacks();
+                        self.curNote.stopAllActions();
+                        cc.log("no click or not click!")
+                        Alert.show("您没有跟上,再来一次？", function(){
+                            self.gameStat();
+                        });
+                    }
+                    self.curNote.scale=1;
+                    self.curNote.setPositionY(100);
+                    self.curNoteCount=i;
+                    self.saveCurNote(0,"")
+                    if (i==len-1) {
+                        cc.log("game over");
+                    }
                 });
-                var seq = cc.sequence(show,big,hide,cb);
-                note.getComponent(cc.Node).runAction(seq);
-            },1.7*(i+1.2));
+                var seq = cc.sequence(spawn1.easing(ease1),hide,cb);
+                self.curNote.runAction(seq);
+            },2*(i+1));
         }
+    },
+
+    saveCurNote(num,key){
+        this.curNoteNum=num;
+        this.curNoteKey=key;
+        cc.log("save count:"+num,"key:"+key);
+    },
+    checkNote(key){
+        return this.curNoteKey == key;
     },
     
     playEffect(audioName){
